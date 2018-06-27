@@ -1,22 +1,23 @@
 #include <iostream>
 #include <string>
 #include <time.h>
-#define BOARDWIDTH 10
-#define BOARDHEIGHT 7
 
 using namespace std;
 
 //// CUSTOMIZE ////
 
+const int BOARDWIDTH = 10;
+const int BOARDHEIGHT = 7;
+
 //##### SET TRAPS HERE #####
 // coordinates need to be in bounds
-int numberOfTraps = 3; // could use sizeOf(traps array), but seems cumbersome?
-int traps[3][2] = {
+const int NUMBEROFTRAPS = 3; // could use sizeOf(traps array), but seems cumbersome?
+const int TRAPS[3][2] = {
     {2,6}, {4,4}, {6,6} // trap location will be array of arrays of two elements, as coordinates
     };
 
 //##### SET TRAPS HERE #####
-int treasure[2] = {6,9};
+int TREASURE[2] = {6,9};
 
 ////     END   ////
 
@@ -25,16 +26,24 @@ int treasure[2] = {6,9};
 // set up board as a character array
 char board[BOARDHEIGHT][BOARDWIDTH];
 
+/// Fall off
+void falloff(){
+    cout << endl << "Oh no! You almost fell off! But you caught the edge with your hand at the last moment! Try again." << endl;
+}
+
+
 // class for our Player
 class Player {
-    //current coords
-    int row = 0;
-    int col = 0; //start top left say
+    private:
+        
+        //current coords
+        int row = 0;
+        int col = 0; //start top left say
     
     public: 
         void moveUp(){
             if (row == 0){
-                cout << "Unfortunately, you cannot move up. Please select a different action." << endl;
+                falloff();
             } else {
                 row -= 1;
             }
@@ -42,7 +51,7 @@ class Player {
 
         void moveDown(){
             if (row == BOARDHEIGHT - 1){
-                cout << "Unfortunately, you cannot move down. Please select a different action." << endl;
+                falloff();
             } else {
                 row += 1;
             }
@@ -50,7 +59,7 @@ class Player {
 
         void moveLeft(){
             if (col == 0){
-                cout << "Unfortunately, you cannot move left. Please select a different action." << endl;
+                falloff();
             } else {
                 col -= 1;
             }
@@ -58,51 +67,51 @@ class Player {
 
         void moveRight(){
             if (col == BOARDWIDTH - 1){
-                cout << "Unfortunately, you cannot move right. Please select a different action." << endl;
+                falloff();
             } else {
                 col += 1;
             }
         }
     
-        int getRow(){
+        int getRow() const{
             return row;
         }
-        int getCol(){
+        int getCol() const{
             return col;
         }
 };
 
 // class for evil monsters M. They can move diagonally, but also off the game!
 class Monster {
-    int mrow;
-    int mcol;
+    int row;
+    int col;
 
     // Constructor
     public: 
     
         Monster(int startRow, int startCol){
-            mrow = startRow;
-            mcol = startCol;
+            row = startRow;
+            col = startCol;
         }
 
         void move(){
             int upwards = (rand() % 3) - 1;
             int downwards = (rand() % 3) - 1;
 
-            mrow = mrow + upwards;
-            mcol = mcol + downwards;
+            row = row + upwards;
+            col = col + downwards;
         }
 
-        int getRow(){
-            return mrow;
+        int getRow() const{
+            return row;
         }
-        int getCol(){
-            return mcol;
+        int getCol() const{
+            return col;
         }
 
 };
 
-void printBoard(Player player, Monster monster1, Monster monster2){
+void printBoard(Player player, Monster& monster1, Monster& monster2){
 
     // monsters will move here
     monster1.move();
@@ -118,12 +127,12 @@ void printBoard(Player player, Monster monster1, Monster monster2){
     }
 
     //replace trap locations with T
-    for (int i = 0; i < numberOfTraps; i++){
-        board[traps[i][0]][traps[i][1]] = 'T';
+    for (int i = 0; i < NUMBEROFTRAPS; i++){
+        board[TRAPS[i][0]][TRAPS[i][1]] = 'T';
     }
 
-    //replace treasure with X
-    board[treasure[0]][treasure[1]] = 'X';
+    //replace TREASURE with X
+    board[TREASURE[0]][TREASURE[1]] = 'X';
 
     //replace player with G
     int row = player.getRow();
@@ -140,7 +149,7 @@ void printBoard(Player player, Monster monster1, Monster monster2){
 
     // loop through array, taking into account where player is
 
-    cout << endl; // padding for visual aesthetic
+    //cout << endl; // padding for visual aesthetic
 
     for (int i = 0; i < 7; i++){
         for (int j = 0; j < 10; j++){
@@ -149,7 +158,7 @@ void printBoard(Player player, Monster monster1, Monster monster2){
         cout << endl;
     }
 
-    cout << endl; // padding for visual aesthetic
+    //cout << endl; // padding for visual aesthetic
 
 }
 
@@ -165,6 +174,8 @@ int main() {
     Monster monster2(5,8);
 
     /// MAIN CODE ///
+
+    cout << "Reach the treasure marked X! You are G. Beware of anything else, including the monsters with special moves and the sides...!" << endl;
 
     for (;;){
         // 1. display the board
@@ -200,22 +211,21 @@ int main() {
                 cout << "Please use the given instructions." << endl;
             }
         }
+        
+        cout << endl;
 
         // 3. Check conditions
         if (board[player.getRow()][player.getCol()] == 'X'){
-            // Win!
             cout << "You've got the treasure! You win!";
             break;
         }
 
         if (board[player.getRow()][player.getCol()] == 'T'){
-            // Lose!
             cout << "Oh no! You landed on a trap! You lose... but you can always try again.";
             break;
         }
 
         if (board[player.getRow()][player.getCol()] == 'M'){
-            // Lose!
             cout << "Oh no! You were eaten by a monster! You lose... but you can always try again.";
             break;
         }
